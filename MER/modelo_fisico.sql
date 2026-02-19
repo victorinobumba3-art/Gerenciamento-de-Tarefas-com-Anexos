@@ -49,4 +49,5 @@ CREATE TABLE Permissao_Utilizador (
     PRIMARY KEY (utilizador_id, permissao_id),
     FOREIGN KEY (utilizador_id) REFERENCES Utilizador(id) ON DELETE CASCADE,
     FOREIGN KEY (permissao_id) REFERENCES Permissao(id) ON DELETE CASCADE
+
 );
