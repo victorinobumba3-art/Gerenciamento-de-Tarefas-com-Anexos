@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Tarefas | Sistema de Gestão de Tarefas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #d1d5db;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        /* Header */
+        header {
+            background: var(--card-bg);
+            padding: 20px 5%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .user-name {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Add Task Section */
+        .add-task-section {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .add-task-section h2 {
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        #taskInput {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        #taskInput:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        #prioritySelect {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        #prioritySelect:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-add {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Task List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            background: var(--card-bg);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: var(--success-color);
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-item.priority-high {
+            border-left-color: var(--danger-color);
+        }
+
+        .task-item.priority-medium {
+            border-left-color: var(--warning-color);
+        }
+
+        .task-item.priority-low {
+            border-left-color: var(--success-color);
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--success-color);
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-text {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .priority-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+        }
+
+        .priority-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .priority-low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .btn-edit {
+            color: var(--warning-color);
+        }
+
+        .btn-edit:hover {
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .btn-delete {
+            color: var(--danger-color);
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-in-progress {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info-color);
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        /* Filtros */
+        .filters-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .filter-group select {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            background: white;
+            font-size: 0.95rem;
+        }
+
+        .filter-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-reset-filters {
+            background: var(--text-muted);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            align-self: flex-end;
+        }
+
+        .btn-reset-filters:hover {
+            background: #374151;
+        }
+
+        /* Anexos */
+        .attachments-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .attachments-section h4 {
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+
+        .attachment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .attachment-item.error {
+            background: rgba(239, 68, 68, 0.05);
+            color: var(--danger-color);
+        }
+
+        .attachment-item i {
+            font-size: 1.1rem;
+        }
+
+        .btn-download {
+            margin-left: auto;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-download:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-remove-attachment {
+            margin-left: auto;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-remove-attachment:hover {
+            background: #dc2626;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn-choose-file {
+            background: var(--info-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .btn-choose-file:hover {
+            background: #2563eb;
+        }
+
+        .file-name-display {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            align-self: center;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border-left: 4px solid var(--success-color);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border-left: 4px solid var(--danger-color);
+        }
+
+        /* Dados da Tarefa */
+        .task-data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .task-data-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+        }
+
+        .task-data-item i {
+            color: var(--primary-color);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: var(--text-main);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .modal-body input,
+        .modal-body select {
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .modal-body input:focus,
+        .modal-body select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-save,
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-save {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-cancel {
+            background: var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-cancel:hover {
+            background: #c5c5c5;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            #taskInput,
+            #prioritySelect,
+            .btn-add {
+                width: 100%;
+            }
+
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .task-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .task-meta {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-left">
+            <h1><i class="fas fa-tasks"></i> Painel de Tarefas</h1>
+            <p>Organize suas atividades com facilidade</p>
+        </div>
+        <div class="header-right">
+            <span class="user-name" id="userName">Usuário</span>
+            <button class="btn-logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> Sair
+            </button>
+        </div>
+    </header>
+
+    <!-- Container Principal -->
+    <div class="container">
+        <!-- Seção de Adicionar Tarefa -->
+        <div class="add-task-section">
+            <h2><i class="fas fa-plus-circle"></i> Nova Tarefa</h2>
+            <div id="alertContainer"></div>
+            
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="taskInput" 
+                    placeholder="Título da tarefa..."
+                    maxlength="100"
+                >
+            </div>
+
+            <div class="input-group" style="margin-top: 15px;">
+                <textarea 
+                    id="taskDescription" 
+                    placeholder="Descrição detalhada (opcional)..."
+                    maxlength="500"
+                    rows="3"
+                    style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; outline: none; font-family: inherit; resize: vertical;"
+                ></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px;">
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">Data de Vencimento</label>
+                    <input 
+                        type="date" 
+                        id="taskDueDate"
+                        style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; outline: none;"
+                    >
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">Prioridade</label>
+                    <select id="prioritySelect" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; outline: none;">
+                        <option value="low">Baixa Prioridade</option>
+                        <option value="medium" selected>Média Prioridade</option>
+                        <option value="high">Alta Prioridade</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">Status</label>
+                    <select id="statusSelect" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; outline: none;">
+                        <option value="pending" selected>Pendente</option>
+                        <option value="in_progress">Em Andamento</option>
+                        <option value="completed">Concluída</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-add" id="addTaskBtn" style="margin-top: 15px;">
+                <i class="fas fa-plus"></i> Adicionar Tarefa
+            </button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label>Filtrar por Status</label>
+                <select id="filterStatus">
+                    <option value="">Todos os Status</option>
+                    <option value="pending">Pendente</option>
+                    <option value="in_progress">Em Andamento</option>
+                    <option value="completed">Concluída</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Filtrar por Prioridade</label>
+                <select id="filterPriority">
+                    <option value="">Todas as Prioridades</option>
+                    <option value="low">Baixa</option>
+                    <option value="medium">Média</option>
+                    <option value="high">Alta</option>
+                </select>
+            </div>
+
+            <button class="btn-reset-filters" id="resetFiltersBtn">
+                <i class="fas fa-redo"></i> Limpar Filtros
+            </button>
+        </div>
+
+        <!-- Lista de Tarefas -->
+        <div id="taskListContainer">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>Nenhuma tarefa ainda</h3>
+                <p>Crie sua primeira tarefa para começar!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Tarefa -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Tarefa</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input 
+                    type="text" 
+                    id="editTaskInput" 
+                    placeholder="Descrição da tarefa"
+                    maxlength="100"
+                >
+                <select id="editPrioritySelect">
+                    <option value="low">Baixa Prioridade</option>
+                    <option value="medium">Média Prioridade</option>
+                    <option value="high">Alta Prioridade</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-save" id="saveEditBtn">Salvar</button>
+                <button class="btn-cancel" id="cancelEditBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Verificar se o usuário está logado
+        function checkAuthentication() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (!isLoggedIn) {
+                window.location.href = '../login/login.html';
+                return;
+            }
+        }
+
+        // Executar verificação de autenticação ao carregar a página
+        checkAuthentication();
+
+        // Objetos e variáveis globais
+        const taskInput = document.getElementById('taskInput');
+        const prioritySelect = document.getElementById('prioritySelect');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskListContainer = document.getElementById('taskListContainer');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userNameElement = document.getElementById('userName');
+
+        // Modal
+        const editModal = document.getElementById('editModal');
+        const editTaskInput = document.getElementById('editTaskInput');
+        const editPrioritySelect = document.getElementById('editPrioritySelect');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        let tasks = [];
+        let editingTaskId = null;
+
+        // Inicializar aplicação
+        init();
+
+        function init() {
+            // Carregar tarefas do localStorage
+            loadTasks();
+            
+            // Carregar nome do usuário
+            const userName = localStorage.getItem('userName') || 'Usuário';
+            userNameElement.textContent = userName;
+
+            // Event listeners
+            addTaskBtn.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addTask();
+            });
+            logoutBtn.addEventListener('click', logout);
+            closeModalBtn.addEventListener('click', closeModal);
+            cancelEditBtn.addEventListener('click', closeModal);
+            saveEditBtn.addEventListener('click', saveEdit);
+
+            renderTasks();
+        }
+
+        // Carregar tarefas do localStorage
+        function loadTasks() {
+            const stored = localStorage.getItem('tasks');
+            tasks = stored ? JSON.parse(stored) : [];
+        }
+
+        // Salvar tarefas no localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        // Adicionar nova tarefa
+        function addTask() {
+            const taskText = taskInput.value.trim();
+            const priority = prioritySelect.value;
+
+            if (!taskText) {
+                alert('Por favor, descreva a tarefa!');
+                return;
+            }
+
+            const newTask = {
+                id: Date.now(),
+                text: taskText,
+                priority: priority,
+                completed: false,
+                createdAt: new Date().toLocaleDateString('pt-BR')
+            };
+
+            tasks.push(newTask);
+            saveTasks();
+            renderTasks();
+
+            // Limpar inputs
+            taskInput.value = '';
+            prioritySelect.value = 'medium';
+            taskInput.focus();
+        }
+
+        // Renderizar lista de tarefas
+        function renderTasks() {
+            if (tasks.length === 0) {
+                taskListContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>Nenhuma tarefa ainda</h3>
+                        <p>Crie sua primeira tarefa para começar!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            taskListContainer.innerHTML = `<div class="task-list">${tasks.map(task => `
+                <div class="task-item priority-${task.priority} ${task.completed ? 'completed' : ''}">
+                    <input 
+                        type="checkbox" 
+                        class="task-checkbox" 
+                        ${task.completed ? 'checked' : ''}
+                        onchange="toggleTask(${task.id})"
+                    >
+                    <div class="task-content">
+                        <div class="task-text">${escapeHtml(task.text)}</div>
+                        <div class="task-meta">
+                            <span class="priority-badge priority-${task.priority}">
+                                ${getPriorityLabel(task.priority)}
+                            </span>
+                            <span><i class="fas fa-calendar-alt"></i> ${task.createdAt}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn-icon btn-edit" onclick="openEditModal(${task.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-delete" onclick="deleteTask(${task.id})" title="Deletar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('')}</div>`;
+        }
+
+        // Toggle tarefa como concluída
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Abrir modal de edição
+        function openEditModal(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                editingTaskId = id;
+                editTaskInput.value = task.text;
+                editPrioritySelect.value = task.priority;
+                editModal.classList.add('active');
+                editTaskInput.focus();
+            }
+        }
+
+        // Fechar modal
+        function closeModal() {
+            editModal.classList.remove('active');
+            editingTaskId = null;
+        }
+
+        // Salvar edição
+        function saveEdit() {
+            if (!editingTaskId) return;
+
+            const newText = editTaskInput.value.trim();
+            const newPriority = editPrioritySelect.value;
+
+            if (!newText) {
+                alert('A descrição da tarefa não pode estar vazia!');
+                return;
+            }
+
+            const task = tasks.find(t => t.id === editingTaskId);
+            if (task) {
+                task.text = newText;
+                task.priority = newPriority;
+                saveTasks();
+                renderTasks();
+                closeModal();
+            }
+        }
+
+        // Deletar tarefa
+        function deleteTask(id) {
+            if (confirm('Tem certeza que deseja deletar esta tarefa?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTasks();
+            }
+        }
+
+        // Logout
+        function logout() {
+            if (confirm('Tem certeza que deseja sair?')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userName');
+                window.location.href = '../login/login.html';
+            }
+        }
+
+        // Utilitários
+        function getPriorityLabel(priority) {
+            const labels = {
+                high: 'Alta',
+                medium: 'Média',
+                low: 'Baixa'
+            };
+            return labels[priority] || priority;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Fechar modal ao clicar fora
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) closeModal();
+        });
+    </script>
+</body>
+</html>
