@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro | Sistema de Gestão de Tarefas</title>
+    <style>
+        /* Reutilizando o mesmo estilo para manter o padrão */
+        :root {
+            --primary-color: #5f43f0;
+            --primary-hover: #4338ca;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #39639e;
+            --text-muted: #6b7280;
+            --border: #d1d5db;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+        body { 
+            background-color: var(--bg-color); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+        }
+
+        .auth-box {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 8px; font-size: 1.8rem; }
+        p { color: var(--text-muted); margin-bottom: 24px; }
+
+        .input-group { text-align: left; margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover { background-color: var(--primary-hover); }
+
+        .footer-link { margin-top: 24px; font-size: 0.9rem; color: var(--text-muted); }
+        .footer-link a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-box">
+        <h1>Criar Conta</h1>
+        <p>Comece a organizar suas tarefas hoje.</p>
+        
+        <form id="registerForm">
+            <div class="input-group">
+                <label for="name">Nome Completo</label>
+                <input type="text" id="name" placeholder="Como quer ser chamado?" required>
+            </div>
+            <div class="input-group">
+                <label for="reg-email">E-mail</label>
+                <input type="email" id="reg-email" placeholder="seu@email.com" required>
+            </div>
+            <div class="input-group">
+                <label for="reg-password">Senha</label>
+                <input type="password" id="reg-password" placeholder="Mínimo 6 caracteres" required>
+            </div>
+            <button type="submit" class="btn-primary">Registrar</button>
+        </form>
+
+        <div class="footer-link">
+            Já tem conta? <a href="../login/login.html">Fazer Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+
+            // Validar senha
+            if (password.length < 6) {
+                alert('A senha deve ter no mínimo 6 caracteres!');
+                return;
+            }
+
+            // Simular registro (em produção, seria uma requisição ao servidor)
+            if (name && email && password) {
+                // Armazenar dados da sessão
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userName', name);
+                localStorage.setItem('userEmail', email);
+
+                alert('Conta criada com sucesso! Bem-vindo ao painel de tarefas!');
+                window.location.href = '../dashboard/dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>
